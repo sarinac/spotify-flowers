@@ -33,7 +33,15 @@ Alternatively, use `python -m` which does the same thing.
 python -m flask run
 ```
 
-### Deploy with Docker
+### Deployment
+
+#### Using Heroku
+
+Set up a Heroku account, connecting it to github and setting configuration variables (same as these environment variables). Heroku uses the `Procfile` and `runtime.txt` files.
+
+#### If using Docker...
+
+Although I ended up not using Docker, the Dockerfile is still here.
 
 Build docker image.
 ```
