@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+
+{% block title %}
+		Spotify Flowers
+{% endblock %}
+
+{% block header %}
+	{{ super() }}
+{% endblock %}
+
+{% block content %}
+	<div id="content-box">
+		<form action="/grow">
+			<p>Type in Spotify Track URI<br></p>
+			<input type="text" name="URI">
+			<input type="submit" value="Draw" onclick="loading()">
+			<p><a href="https://community.spotify.com/t5/Spotify-Answers/What-s-a-Spotify-URI/ta-p/919201">What is a Spotify URI?</a></p>
+		</form>
+	</div>
+	<div id="content-box">
+		<div class="loader hidden"></div>
+		<div id="petal-chart" class="overlay"></div>
+	</div>
+{% endblock %}
+
+{% block footer %}
+	{{ super() }}
+	<script src="https://d3js.org/d3.v4.js"></script>
+	<script>var data = {{ dataset|tojson }};</script>
+	<script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% endblock %}
