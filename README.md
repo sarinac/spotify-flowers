@@ -1,5 +1,7 @@
 # spotify-flowers 🌸 🌹 🌺
 
+[See final product here!](https://spotify-flowers.herokuapp.com/)
+
 This project is version 2 of my [design on visualizing Spotify data with d3.js](https://github.com/sarinac/Visual-Sandbox/tree/master/03_electroswing_on_spotify). I created a visual for 1 song (Lone Digger by Caravan Palace) and then wanted to extend it for any song found on Spotify. 
 
 ## Instructions
