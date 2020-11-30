@@ -4,7 +4,7 @@ This project is version 2 of my [design on visualizing Spotify data with d3.js](
 
 ## Instructions
 
-## Set Environment Variables
+### Set Environment Variables
 
 Create a `.env` file to set the following variables.
 
@@ -15,14 +15,14 @@ export SPOTIPY_CLIENT_ID = ""
 export SPOTIPY_CLIENT_SECRET = ""
 ```
 
-## Set up Virtual Environment
+### Set up Virtual Environment
 
 Create a virtual environment.
 ```
 pipenv shell
 ```
 
-## Run Application Locally
+### Run Application Locally
 
 Run using Flask.
 ```
@@ -33,7 +33,7 @@ Alternatively, use `python -m` which does the same thing.
 python -m flask run
 ```
 
- ## Deploy
+### Deploy with Docker
 
 Build docker image.
 ```
