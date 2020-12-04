@@ -34,8 +34,8 @@ class Flowers {
         this.vase = this.svg.append("g").classed("vase", true);
         this.drawVase();
 
-        // create boquet (change to forces/positions + stems + vase)
-        this.boquet = this.svg.append("g").classed("boquet", true);
+        // create bouquet (change to forces/positions + stems + vase)
+        this.bouquet = this.svg.append("g").classed("bouquet", true);
         this.drawFlowers();
 
     }
@@ -193,7 +193,7 @@ class Flowers {
             ].join(" ")
         };
 
-        this.stems = this.boquet
+        this.stems = this.bouquet
             .append("g")
                 .selectAll("g")
                 .data(this.data)
@@ -203,7 +203,7 @@ class Flowers {
                     .append("path")
                         .attr("d", d => drawStemPath(d, true));
 
-        this.flowers = this.boquet
+        this.flowers = this.bouquet
             .append("g")
                 .selectAll("g")
                 .data(this.data)
