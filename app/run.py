@@ -14,9 +14,16 @@ def index():
 
 @app.route("/grow")
 def grow():
-    uri = request.args["URI"]
+    query = request.args["track"]
+    track = spotify.search(query)
+
+    uri = spotify.search_uri()
     dataset = spotify.get_results(uri)
-    return render_template("index.html", dataset=dataset)
+
+    track = spotify.search_track()
+    artist = spotify.search_artist()
+
+    return render_template("index.html", dataset=dataset, track=track, artist=artist)
 
 
 if __name__ == "__main__":

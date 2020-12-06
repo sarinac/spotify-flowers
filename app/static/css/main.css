@@ -70,9 +70,12 @@ button {
 }
 
 .content-box {
-	display: inline;
-	margin: 0 auto;
-	position: relative;
+	/* display: inline; */
+	/* position: relative; */
+}
+
+.content-box-description {
+	padding-top: 40px;
 }
 
 .overlay {

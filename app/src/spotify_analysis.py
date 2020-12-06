@@ -24,17 +24,72 @@ class SpotifyAnalysis:
     def __init__(self):
         """Create Spotify API client."""
         self.spotify = Spotify(
-            client_credentials_manager=SpotifyClientCredentials(
-                client_id=SPOTIPY_CLIENT_ID, client_secret=SPOTIPY_CLIENT_SECRET
-            )
+            auth_manager=SpotifyClientCredentials(
+                client_id=SPOTIPY_CLIENT_ID,
+                client_secret=SPOTIPY_CLIENT_SECRET,
+            ),
         )
 
+        self.search_results = None
         self.sections = None
         self.bars = None
         self.segments = None
         self.pitches = None
         self.bars_to_sections = None
         self.pitches_to_bars = None
+
+    def search(self, query: str):
+        """Use Spotify's search API to retrieve an item.
+
+        Parameters
+        ----------
+        query : str
+            Name of track
+        """
+        try:
+            results = self.spotify.search(q=query, type=["track"], limit=1)
+            self.search_results = results["tracks"]["items"][0]
+        except:
+            self.search_results = {}
+
+    def search_track(self):
+        """Get track name from Search API.
+
+        Returns
+        ----------
+        str
+            Name of track
+        """
+        try:
+            return self.search_results["name"]
+        except:
+            return ""
+
+    def search_artist(self):
+        """Get artist name from Search API.
+
+        Returns
+        ----------
+        str
+            Name of artist
+        """
+        try:
+            return self.search_results["artists"][0]["name"]
+        except:
+            return ""
+
+    def search_uri(self):
+        """Get uri name from Search API.
+
+        Returns
+        ----------
+        str
+            Name of uri
+        """
+        try:
+            return self.search_results["uri"]
+        except:
+            return ""
 
     def get_results(self, uri: str):
         """Get transformed results from Spotify audio analysis.
@@ -50,7 +105,7 @@ class SpotifyAnalysis:
             JSON for d3.js
         """
         try:
-            results = self.spotify.audio_analysis(f"spotify:track:{uri}")
+            results = self.spotify.audio_analysis(uri)
         except:
             return {}
 
@@ -143,7 +198,12 @@ class SpotifyAnalysis:
             )
 
         pitches = pd.DataFrame(
-            pitches, columns=["start_pitches", "duration_pitches",] + PITCHES_LIST,
+            pitches,
+            columns=[
+                "start_pitches",
+                "duration_pitches",
+            ]
+            + PITCHES_LIST,
         )
 
         pitches["end_pitches"] = pitches["start_pitches"] + pitches["duration_pitches"]
@@ -169,7 +229,13 @@ class SpotifyAnalysis:
         # Cartesian join sections and bars
         bars["join"] = 1
         sections["join"] = 1
-        x_join = pd.merge(bars, sections, how="outer", left_on="join", right_on="join",)
+        x_join = pd.merge(
+            bars,
+            sections,
+            how="outer",
+            left_on="join",
+            right_on="join",
+        )
 
         # Filter where START bars occur before END sections
         x_join = x_join[x_join.start_bars <= x_join.end_sections]
@@ -214,7 +280,13 @@ class SpotifyAnalysis:
         # Cross join pitches and bars
         pitches["join"] = 1
         bars["join"] = 1
-        x_join = pd.merge(pitches, bars, how="outer", left_on="join", right_on="join",)
+        x_join = pd.merge(
+            pitches,
+            bars,
+            how="outer",
+            left_on="join",
+            right_on="join",
+        )
 
         # Filter where START pitches occur before END bars
         x_join = x_join[x_join.start_pitches <= x_join.end_bars]
@@ -256,6 +328,10 @@ class SpotifyAnalysis:
             .count()
             .iloc[:, 0]
         )
+
+        # Check that bars have the same number of sections, otherwise trim sections
+        difference = sections.shape[0] - len(bar_count)
+        sections = sections.iloc[0 : sections.shape[0] - difference]
 
         df_flowers = pd.DataFrame(
             {
