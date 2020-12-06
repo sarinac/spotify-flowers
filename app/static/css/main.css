@@ -70,6 +70,7 @@ button {
 }
 
 .content-box {
+	margin-left: 0px;
 	/* display: inline; */
 	/* position: relative; */
 }
