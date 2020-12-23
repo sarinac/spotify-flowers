@@ -9,18 +9,22 @@
 {% endblock %}
 
 {% block content %}
-	<div class="content-box">
+	<div class="content-box-left">
+		<h1>Music Visualization</h1>
+		<h1>with Spotify</h1>
 		<form action="/grow">
-			<p>Type in Name of Track<br></p>
-			<input type="text" name="track">
+			<input type="text" name="track" placeholder="Type track name here" autocomplete="off">
 			<input type="submit" value="Draw" onclick="loading()">
 		</form>
 		<div class="content-box-description">
 			<h3>{{ track }}</h3>
-			<p>{{ artist }}</p>
+			<h3>{{ artist }}</h3>
+			<p>{{ description_sections }}</p>
+			<p>{{ description_bars }}</p>
+			<div id="legend"></div>
 		</div>
 	</div>
-	<div class="content-box">
+	<div class="content-box-right">
 		<div class="loader hidden"></div>
 		<div id="petal-chart" class="overlay"></div>
 	</div>

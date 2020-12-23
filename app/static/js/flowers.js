@@ -19,6 +19,7 @@ class Flowers {
         this.svg = d3.select("#petal-chart")
             .append("svg")
                 .classed("hidden", true)
+                .attr("id", "svg")
                 .attr("width", this.width)
                 .attr("height", this.height);
 
@@ -45,13 +46,15 @@ class Flowers {
         // create glow
         const strokeFilter = this.defs
             .append("filter")
-                .attr("id", "glow");
+                .attr("id", "glow")
+                .attr("x", "-100%")
+                .attr("y", "-100%")
+                .attr("height", "300%")
+                .attr("width", "300%");
 
         strokeFilter
             .append("feGaussianBlur")
                 .attr("stdDeviation", 6)
-                .attr("height", "200%")
-                .attr("width", "200%")
                 .attr("result", "strokeBlur")
                 .attr("in", "SourceGraphic");      
 
@@ -74,6 +77,25 @@ class Flowers {
                     .attr("in", "SourceGraphic")
                     .attr("stdDeviation", 4);
 
+        // create fill gradient
+        this.defs
+            .append("linearGradient")
+                .attr("id", "fill-gradient")
+                .attr("gradientTransform", "rotate(60)")
+                .attr("x1", "0%")
+                .attr("x2", "100%")
+                .attr("y1", "0%")
+                .attr("y2", "50%")
+                .selectAll("stop")
+                .data([
+                    {offset: "0%", color: "#000"},
+                    {offset: "100%", color: "#fff"},
+                ])
+                .enter()
+                .append("stop")
+                    .attr("offset", function(d) { return d.offset; })
+                    .attr("stop-color", function(d) { return d.color; });
+
     }
 
     createScales() {
@@ -85,7 +107,7 @@ class Flowers {
     
         // scale for flower shapes
         this.flowerShapeScale = d3.scaleLinear()
-            .domain([d3.min(this.data, d=> d.confidence_sections), d3.max(this.data, d=> d.confidence_sections)])
+            .domain([d3.min(this.data, d => d.confidence_sections), d3.max(this.data, d=> d.confidence_sections)])
             .range([.7, 1]);
 
         // scale for flower stems
@@ -152,7 +174,8 @@ class Flowers {
 
         this.vase
             .append("path")
-            .attr("d", path);
+            .attr("d", path)
+            .attr("fill", "url(#fill-gradient)");
 
     }
 

@@ -1,6 +1,7 @@
 
 import Flowers from "./flowers.js"
 import Validations from "./validations.js"
+import Legend from "./legend.js"
 
 
 if(Validations.check(data)) {
@@ -13,4 +14,7 @@ if(Validations.check(data)) {
 
     // Draw
     new Flowers(data);
+
+    // Legend
+    Legend.drawLegend();
 } 

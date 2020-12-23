@@ -25,8 +25,7 @@ class SpotifyAnalysis:
         """Create Spotify API client."""
         self.spotify = Spotify(
             auth_manager=SpotifyClientCredentials(
-                client_id=SPOTIPY_CLIENT_ID,
-                client_secret=SPOTIPY_CLIENT_SECRET,
+                client_id=SPOTIPY_CLIENT_ID, client_secret=SPOTIPY_CLIENT_SECRET,
             ),
         )
 
@@ -37,6 +36,8 @@ class SpotifyAnalysis:
         self.pitches = None
         self.bars_to_sections = None
         self.pitches_to_bars = None
+        self.number_sections = None
+        self.number_bars = None
 
     def search(self, query: str):
         """Use Spotify's search API to retrieve an item.
@@ -198,12 +199,7 @@ class SpotifyAnalysis:
             )
 
         pitches = pd.DataFrame(
-            pitches,
-            columns=[
-                "start_pitches",
-                "duration_pitches",
-            ]
-            + PITCHES_LIST,
+            pitches, columns=["start_pitches", "duration_pitches",] + PITCHES_LIST,
         )
 
         pitches["end_pitches"] = pitches["start_pitches"] + pitches["duration_pitches"]
@@ -229,13 +225,7 @@ class SpotifyAnalysis:
         # Cartesian join sections and bars
         bars["join"] = 1
         sections["join"] = 1
-        x_join = pd.merge(
-            bars,
-            sections,
-            how="outer",
-            left_on="join",
-            right_on="join",
-        )
+        x_join = pd.merge(bars, sections, how="outer", left_on="join", right_on="join",)
 
         # Filter where START bars occur before END sections
         x_join = x_join[x_join.start_bars <= x_join.end_sections]
@@ -280,13 +270,7 @@ class SpotifyAnalysis:
         # Cross join pitches and bars
         pitches["join"] = 1
         bars["join"] = 1
-        x_join = pd.merge(
-            pitches,
-            bars,
-            how="outer",
-            left_on="join",
-            right_on="join",
-        )
+        x_join = pd.merge(pitches, bars, how="outer", left_on="join", right_on="join",)
 
         # Filter where START pitches occur before END bars
         x_join = x_join[x_join.start_pitches <= x_join.end_bars]
@@ -345,6 +329,12 @@ class SpotifyAnalysis:
                 "num_bars_sections": bar_count.values,
                 "key_sections": sections["key_sections"],
             }
+        )
+
+        # Count number of sections and bars
+        self.number_sections = df_flowers.shape[0]
+        self.number_bars = (
+            df_flowers[["index_sections", "num_bars_sections"]].sum().num_bars_sections
         )
 
         return df_flowers
