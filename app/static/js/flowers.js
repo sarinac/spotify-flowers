@@ -180,91 +180,88 @@ class Flowers {
     }
 
     drawFlowers() {
+        // Run web worker to calculate positions before drawing flowers and stems
+        for(let i=0; i < this.data.length; i++) {
+            this.data[i].startX = this.flowerStartX(this.data[i].index_sections);
+            this.data[i].startY = this.height / 4;
+        };
 
-        const flowerMoveX = d => {
-            return Math.min(
-                Math.max(
-                    this.padding + this.petalSizeScale(d.loudness_sections)
-                    , d.x
+        let worker = new Worker("static/js/worker.js");
+
+        worker.postMessage({
+            notes: this.data,
+            width: this.width,
+            height: this.height,
+        });
+
+        worker.onmessage = (event) => {
+            this.data = event.data.notes;
+            worker.terminate();
+
+            const flowerMoveX = d => {
+                return Math.min(
+                    Math.max(
+                        this.padding + this.petalSizeScale(d.loudness_sections)
+                        , d.x
+                    )
+                    , this.width - this.padding - this.petalSizeScale(d.loudness_sections)
                 )
-                , this.width - this.padding - this.petalSizeScale(d.loudness_sections)
-            )
-        };
+            };
 
-        const flowerMoveY = d => {
-            return Math.min(
-                Math.max(
-                    this.padding + this.petalSizeScale(d.loudness_sections)
-                    , d.y
-                ), this.height - this.padding - this.petalSizeScale(d.loudness_sections)
-            )
-        };
+            const flowerMoveY = d => {
+                return Math.min(
+                    Math.max(
+                        this.padding + this.petalSizeScale(d.loudness_sections)
+                        , d.y
+                    ), this.height - this.padding - this.petalSizeScale(d.loudness_sections)
+                )
+            };
 
-        const drawStemPath = (d, start) => {
-            let x = start ? 0 : flowerMoveX(d),
-                y = start ? 0 : flowerMoveY(d);
-            return [
-                `M${this.flowerStemScale(d.index_sections)},${this.height - this.padding*2}`,
-                `L${this.flowerStemScale(d.index_sections)},${this.height * 0.7}`,
-                `C${this.flowerStemScale(d.index_sections)},${this.height * 0.5}`,
-                `${
-                    this.flowerStemScale(d.index_sections) < x // if curving right
-                    ? this.flowerStemScale(d.index_sections) + (x - this.flowerStemScale(d.index_sections)) * .5
-                    : x + (this.flowerStemScale(d.index_sections) - x) * .5
-                },${this.height * 0.5 + (y - this.height * 0.5) * .8}`,
-                `${x},${y}`,
-            ].join(" ")
-        };
+            const drawStemPath = (d, start) => {
+                let x = start ? 0 : flowerMoveX(d),
+                    y = start ? 0 : flowerMoveY(d);
+                return [
+                    `M${this.flowerStemScale(d.index_sections)},${this.height - this.padding*2}`,
+                    `L${this.flowerStemScale(d.index_sections)},${this.height * 0.7}`,
+                    `C${this.flowerStemScale(d.index_sections)},${this.height * 0.5}`,
+                    `${
+                        this.flowerStemScale(d.index_sections) < x // if curving right
+                        ? this.flowerStemScale(d.index_sections) + (x - this.flowerStemScale(d.index_sections)) * .5
+                        : x + (this.flowerStemScale(d.index_sections) - x) * .5
+                    },${this.height * 0.5 + (y - this.height * 0.5) * .8}`,
+                    `${x},${y}`,
+                ].join(" ")
+            };
 
-        this.stems = this.bouquet
-            .append("g")
-                .selectAll("g")
-                .data(this.data)
-                .enter()
+            this.stems = this.bouquet
                 .append("g")
-                    .classed("stem", true)
-                    .append("path")
-                        .attr("d", d => drawStemPath(d, true));
+                    .selectAll("g")
+                    .data(this.data)
+                    .enter()
+                    .append("g")
+                        .classed("stem", true)
+                        .append("path")
+                            .attr("d", d => drawStemPath(d, true));
 
-        this.flowers = this.bouquet
-            .append("g")
-                .selectAll("g")
-                .data(this.data)
-                .enter()
+            this.flowers = this.bouquet
                 .append("g")
-                    .classed("flower", true);
+                    .selectAll("g")
+                    .data(this.data)
+                    .enter()
+                    .append("g")
+                        .classed("flower", true);
 
-        var iteration = 1;
-        var simulation = d3.forceSimulation(this.data).alphaDecay(0.01)
-            .force("x", d3.forceX().x(d => this.flowerStartX(d.index_sections)).strength(.5))
-            .force("collide", d3.forceCollide().radius(d => this.petalSizeScale(d.loudness_sections)*1.2)) // Avoid overlapping
-            .on("tick", () => {
-                if (simulation.alpha() > 0.1) {
-                    // continue running simulation
-                    this.flowers
-                        .attr("transform", d => `translate(${flowerMoveX(d)},${flowerMoveY(d)})`);
-                    this.stems
-                        .attr("d", d => drawStemPath(d, false));
-                } else if (iteration == 1) {
-                    // restart simulation with new forces
-                    simulation.alpha(.5).restart();
-                    simulation
-                        .force("center", d3.forceCenter().x(this.width/2).y(this.height/4))
-                        .force("x", d3.forceX().x(this.width/2).strength(.2))
-                        .force("y", d3.forceY().y(this.height/4).strength(.5));
-                    iteration = 2;
-                } else {
-                    // stop simulation
-                    simulation.stop();
-                    // run the remaining steps for drawing flower (this has heavy computation and should run AFTER simulation)
-                    this.createBackgrounds();
-                    this.createColors();
-                    this.createOutlines();
-                    this.svg.classed("hidden", false);
-                    d3.select("div.loader").classed("hidden", true);
-                };
-            });
+            this.flowers
+                .attr("transform", d => `translate(${flowerMoveX(d)},${flowerMoveY(d)})`);
+            this.stems
+                .attr("d", d => drawStemPath(d, false));
 
+            this.createBackgrounds();
+            this.createColors();
+            this.createOutlines();
+            this.svg.classed("hidden", false);
+            d3.select("div.loader").classed("hidden", true);
+        };
     }
 
     createBackgrounds() {

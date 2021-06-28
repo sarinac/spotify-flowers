@@ -15,7 +15,7 @@ def index():
 @app.route("/grow")
 def grow():
     query = request.args["track"]
-    track = spotify.search(query)
+    spotify.search(query)
 
     uri = spotify.search_uri()
     dataset = spotify.get_results(uri)
