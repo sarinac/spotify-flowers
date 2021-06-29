@@ -10,8 +10,8 @@ class Flowers {
     draw() {
 
         // define SVG dimensions
-        this.width = 700,
-        this.height = 800,
+        this.width = 0.7 * window.innerHeight,
+        this.height = 0.8 * window.innerHeight,
         this.threshold = .55, 
         this.padding = 20;
 

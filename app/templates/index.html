@@ -10,14 +10,13 @@
 
 {% block content %}
 	<div class="content-box-left">
-		<h1>Music Visualization</h1>
-		<h1>with Spotify</h1>
+		<h1>Music Visualization with Spotify</h1>
 		<form action="/grow">
 			<input type="text" name="track" placeholder="Type track name here" autocomplete="off">
 			<input type="submit" value="Draw" onclick="loading()">
 		</form>
 		<div class="content-box-description">
-			<h3>{{ track }}</h3>
+			<h2>{{ track }}</h2>
 			<h3>{{ artist }}</h3>
 			<p>{{ description_sections }}</p>
 			<p>{{ description_bars }}</p>
@@ -25,8 +24,7 @@
 		</div>
 	</div>
 	<div class="content-box-right">
-		<div class="loader hidden"></div>
-		<div id="petal-chart" class="overlay"></div>
+		<div id="petal-chart"></div>
 	</div>
 {% endblock %}
 

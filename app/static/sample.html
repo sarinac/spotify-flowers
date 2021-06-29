@@ -2,11 +2,43 @@
     <head>
         <link href="css/main.css" rel="stylesheet" type="text/css" />
     </head>
-    <script src="https://d3js.org/d3.v4.js"></script>
-    <script>
-        d3.json("data/sample.json", (e, j) => {
-            var data = j;
-        });
-    </script>
-    <script type="module" src="js/main.js"></script>
+    <body>
+        <div id="content">
+            <div class="content-box-left">
+                <h1>Music Visualization with Spotify</h1>
+                <form action="/grow">
+                    <input
+                        type="text"
+                        name="track"
+                        placeholder="Type track name here"
+                        autocomplete="off"
+                    />
+                    <input type="submit" value="Draw" onclick="loading()" />
+                </form>
+                <div class="content-box-description">
+                    <h2>In The Heights</h2>
+                    <h3>by Anthony Ramos</h3>
+                    <p>This arrangement consists of 18 flowers, each representing a section in the music with its stem positioned in order of when it plays. The size of the flower corresponds to the loudness of the section.</p>
+                    <p>Each of the 325 petals is a musical bar, which progresses clockwise within each flower. The colors in each petal represent different pitches moving from the center to the tips.</p>
+                    <div id="legend"></div>
+                </div>
+            </div>
+            <div class="content-box-right">
+                <div id="petal-chart"></div>
+            </div>
+        </div>
+        <div id="footer">
+            <h3>
+                Created by <a href="https://ifcolorful.com">Sarina Chen</a>. &copy; 2021.
+            </h3>
+            <script src="https://d3js.org/d3.v4.js"></script>
+            <script>
+                var data;
+                d3.json("data/sample.json", (e, j) => {
+                    data = j;
+                });
+            </script>
+            <script type="module" src="js/main.js"></script>
+        </div>
+    </body>
 </html>
